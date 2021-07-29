@@ -1,4 +1,5 @@
 import pygame
+import amir,talout
 pygame.init()
 pygame.display.set_mode((1000, 200))
 background1 = pygame.image.load("environment/ground_1.png")
