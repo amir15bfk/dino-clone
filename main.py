@@ -30,6 +30,10 @@ replay_img = pygame.image.load("assets/replay.png")
 Cloud_img = pygame.image.load("assets/Cloud.png")
 dino_big_eyes = pygame.image.load("assets/player/Dino-big-eyes.png")
 speed = 0
+# load sounds
+jump_sound = pygame.mixer.Sound("assets/jump_sound.wav")
+death_sound = pygame.mixer.Sound("assets/death_sound.wav")
+
 # colors
 bg_color= pygame.Color(255,255,255)
 obj_color= pygame.Color(102,102,102)
@@ -171,10 +175,10 @@ class Enemies:
             if pygame.Rect.collidepoint(self.list[i].img.rect, player.rect.center) or pygame.Rect.collidepoint(self.list[i].img.rect, player.rect.topright):
                 global game_run,speed , replay_v
                 game_run = False
-                print(speed)
                 speed = 0
                 replay.vissible = True
                 player.set_img(dino_big_eyes)
+                death_sound.play()
 
 
 class Player():
@@ -190,6 +194,7 @@ class Player():
         self.score = 0
     def jump(self):
         if self.rect.bottom == self.y:
+            jump_sound.play()
             self.speed = 15
     def swap(self):
         if player_imgs["current"]==0:
