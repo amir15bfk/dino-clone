@@ -24,6 +24,8 @@ enemies_img =[[pygame.image.load("assets/enemies/Cactus-1.png"),pygame.image.loa
 player_imgs = {"img":{"up":[pygame.image.load("assets/player/Dino-left-up.png"),pygame.image.load("assets/player/Dino-right-up.png")],
                     "down":[pygame.image.load("assets/player/Dino-below-left-up.png"),pygame.image.load("assets/player/Dino-below-right-up.png")]},
                 "current":0}
+replay_img = pygame.image.load("assets/replay.png")
+
 speed = 0
 # colors
 bg_color= pygame.Color(255,255,255)
@@ -42,6 +44,7 @@ class Obj:
         self.set_img(img)
         self.rect = self.img.get_rect()
         self.rect.topleft=(x,y)
+
     def set_img(self,img):
         width = img.get_width()
         print(width)
@@ -51,6 +54,20 @@ class Obj:
         screen.blit(self.img,(self.rect.x,self.rect.y))
     def move(self):
         self.rect.left-=speed
+class Replay:
+    def __init__(self,img,x,y,scale=0.8):
+        self.scale =scale
+        self.set_img(img)
+        self.rect = self.img.get_rect()
+        self.rect.topleft=(x,y)
+        self.vissible = False
+    def set_img(self,img):
+        width = img.get_width()
+        print(width)
+        height = img.get_height()
+        self.img = pygame.transform.scale(img,(int(width*self.scale),int(height*self.scale)))     
+    def draw(self):
+        screen.blit(self.img,(self.rect.x,self.rect.y))
 class Enemie:
     def __init__(self,img,x,y,scale=2):
         self.scale =scale
@@ -122,12 +139,14 @@ class Enemies:
             self.list[i].move()
             if self.list[i].img.rect.right<=0:
                 chois = random.randint(0,1)
-                if chois and player.score>100:
-                    chois = random.randint(0,1)
-                    if chois:
+                if chois and player.score>0:
+                    chois = random.randint(0,2)
+                    if chois==1:
                         self.list[i]=bird( self.list[(i+2)%3].img.rect.right+600,600)
+                    elif chois==2:
+                        self.list[i]=bird( self.list[(i+2)%3].img.rect.right+600,530)
                     else:
-                        self.list[i]=bird( self.list[(i+2)%3].img.rect.right+600,520)
+                        self.list[i]=bird( self.list[(i+2)%3].img.rect.right+600,510)
                 else:
                     self.list[i]=Cactus( self.list[(i+2)%3].img.rect.right+600,600)
     def draw(self):
@@ -135,10 +154,11 @@ class Enemies:
             self.list[i].draw()
     def kill(self,player):
         for i in range(3):
-            if pygame.Rect.collidepoint(self.list[i].img.rect, player.rect.center):
-                global game_run,speed
+            if pygame.Rect.collidepoint(self.list[i].img.rect, player.rect.center) or pygame.Rect.collidepoint(self.list[i].img.rect, player.rect.topright):
+                global game_run,speed , replay_v
                 game_run = False
                 speed = 0
+                replay.vissible = True
 
 
 class Player():
@@ -196,6 +216,9 @@ class Player():
 player = Player(player_imgs["img"]["up"][0],20,600)
 background = Background(background_imgs)
 enemies = Enemies(1280,600,600)
+
+replay = Replay(replay_img,0,0)
+replay.rect.center = (screen_width//2,screen_height//2)
 #loop
 while True:
     #handling input
@@ -213,6 +236,7 @@ while True:
                     enemies = Enemies(1280,600,600)
                     game_run=True
                     speed=10
+                    replay.vissible = False
             elif event.key == pygame.K_DOWN:
                 if game_run:
                     player.state = "down"
@@ -228,10 +252,13 @@ while True:
         speed+=0.005
         background.move()
         enemies.move()
+    
 
     background.draw()
     enemies.draw()
     player.draw()
+    if replay.vissible:
+        replay.draw()
 
     score_text = font.render(f"HI {hi_score:07} {player.score:07}",False,obj_color)
     screen.blit(score_text,(screen_width-450,10))
