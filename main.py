@@ -1,6 +1,5 @@
 import pygame ,sys,random
 
-from pygame.transform import scale
 
 
 #general setup
@@ -15,7 +14,7 @@ f.close()
 screen_width = 1280
 screen_height = 720
 screen = pygame.display.set_mode((screen_width,screen_height))
-pygame.display.set_caption('dino-clone')
+pygame.display.set_caption('dino-clone by amir15bfk and talout-chattah')
 
 # load imges
 background_imgs = [pygame.image.load("assets/environment/ground_1.png"),pygame.image.load("assets/environment/ground_2.png")]
